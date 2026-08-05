@@ -2,10 +2,23 @@ import express from "express"
 import "dotenv/config";
 import { toNodeHandler } from "better-auth/node";
 import {auth} from "./lib/auth.js"
-
+import cors from "cors"
+import { registerRoutes } from "./routes/index.js";
+import { error } from "node:console";
+import { errorHandler } from "./middleware/error-handler.middleware.js";
 
 const app = express();
 const PORT = process.env.PORT
+
+const clientUrl = process.env.CLIENT_URL ?? "http://localhost:3000"
+
+
+app.use(
+    cors({
+        origin : clientUrl,
+        credentials : true
+    })
+)
 
 app.all("/api/auth/{*any}", toNodeHandler(auth));
 // Mount express json middleware after Better Auth handler
@@ -21,6 +34,12 @@ app.get("/",(req,res)=>{
 app.get('/health',(req,res)=>{
     res.send("Hello I am Healthy...")
 })
+
+registerRoutes(app);
+
+
+
+app.use(errorHandler)
 
 app.listen(PORT , ()=>{
     console.log(`Serer is Running on PORT ${PORT}`);
