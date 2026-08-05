@@ -82,7 +82,7 @@ model Verification {
   @@map("verification")
 }
 
-model Workspace{
+model Workspace {
   id String @id @default(cuid())
   userId String
   title  String
@@ -93,9 +93,63 @@ model Workspace{
   updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId] , references: [id] , onDelete: Cascade)
+  
+  source Source[]
 
   @@index([userId])
   @@map("workspace")
 
 
+}
+
+enum SourceType {
+  PDF
+  TEXT
+  MARKDOWN
+  YOUTUBE
+  WEBSITE
+}
+
+enum SourceStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+}
+
+model Source {
+  id String @id @default(cuid())
+  workspaceId String
+  type SourceType
+  title String
+  content String?
+  url String?
+  status SourceStatus @default(PENDING)
+  metadata Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  workspace Workspace @relation(fields: [workspaceId] , references: [id] , onDelete: Cascade)
+
+  sourceChunk SourceChunk[]
+
+  @@index([workspaceId])
+  @@index([workspaceId , type])
+  @@index([workspaceId ,status])
+  @@map("source")
+}
+
+model SourceChunk {
+  id String @id @default(cuid())
+  sourceId String
+  index Int
+  cotent String
+  tokenCount Int?
+  metaData Json?
+  createdAt DateTime @default(now())
+  
+  source Source @relation(fields: [sourceId] , references: [id] , onDelete: Cascade)
+
+  @@unique([sourceId,index])
+  @@index([sourceId])
+  @@map("source_chunk")
 }
