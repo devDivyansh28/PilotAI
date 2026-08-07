@@ -60,27 +60,6 @@ export async function createTextOrMarkdownSource(
   // });
 }
 
-export async function importWebsiteSource(
-  workspaceId: string,
-  userId: string,
-  input: ImportWebsiteInput,
-) {
-  await getWorkspaceByIdForUser(workspaceId, userId);
-
-  const scraped = await scrapeWebsite(input.url);
-
-  return createAndProcessSource({
-    workspaceId,
-    type: "WEBSITE",
-    title: input.title || scraped.title || input.url,
-    content: scraped.markdown,
-    url: scraped.sourceUrl,
-    status: "PENDING",
-    metadata: {
-      importedFrom: scraped.sourceUrl,
-    },
-  });
-}
 
 export async function uploadPdfSource(
   workspaceId: string,
@@ -116,6 +95,28 @@ export async function uploadPdfSource(
       publicId: upload.publicId,
       resourceType: upload.resourceType,
       pageCount,
+    },
+  });
+}
+
+export async function importWebsiteSource(
+  workspaceId: string,
+  userId: string,
+  input: ImportWebsiteInput,
+) {
+  await getWorkspaceByIdForUser(workspaceId, userId);
+
+  const scraped = await scrapeWebsite(input.url);
+
+  return createAndProcessSource({
+    workspaceId,
+    type: "WEBSITE",
+    title: input.title || scraped.title || input.url,
+    content: scraped.markdown,
+    url: scraped.sourceUrl,
+    status: "PENDING",
+    metadata: {
+      importedFrom: scraped.sourceUrl,
     },
   });
 }
