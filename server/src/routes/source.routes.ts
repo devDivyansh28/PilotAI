@@ -4,7 +4,8 @@ import {
   uploadPdf,
   createSource,
   listSources,
-  importWebsite
+  importWebsite,
+  importYoutube
 } from "../controllers/source.controller.js";
 import { uploadSinglePdf } from "../middleware/upload.middleware.js";
 
@@ -13,7 +14,9 @@ export const sourceRoutes = Router({ mergeParams: true });
 
 sourceRoutes.post("/upload", uploadSinglePdf, asyncHandler(uploadPdf));
 sourceRoutes.post("/import/website", asyncHandler(importWebsite));
+sourceRoutes.post("/import/youtube", asyncHandler(importYoutube));
 
 sourceRoutes.get("/", asyncHandler(listSources));
 sourceRoutes.post("/", asyncHandler(createSource));
+
 

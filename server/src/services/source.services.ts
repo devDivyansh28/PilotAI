@@ -15,8 +15,8 @@ import {
 
 import { getWorkspaceByIdForUser } from "./workspace.services.js";
 
-import {uploadPdfToCloudinary} from "../lib/cloudinary.js"
-import {extractPdfFromBuffer} from "../lib/pdf.js"
+import { uploadPdfToCloudinary } from "../lib/cloudinary.js";
+import { extractPdfFromBuffer } from "../lib/pdf.js";
 
 async function assertWorkspaceAccess(workspaceId: string, userId: string) {
   await getWorkspaceByIdForUser(workspaceId, userId);
@@ -34,6 +34,8 @@ async function createAndProcessSource(
 
   return source;
 }
+
+import {fetchYoutubeTranscript} from "../lib/youtube.js"
 
 export async function listSourcesForWorkspace(
   workspaceId: string,
@@ -59,7 +61,6 @@ export async function createTextOrMarkdownSource(
   //     status: "PENDING",
   // });
 }
-
 
 export async function uploadPdfSource(
   workspaceId: string,
@@ -117,6 +118,28 @@ export async function importWebsiteSource(
     status: "PENDING",
     metadata: {
       importedFrom: scraped.sourceUrl,
+    },
+  });
+}
+
+export async function importYoutubeSource(
+  workspaceId: string,
+  userId: string,
+  input: ImportYoutubeInput,
+) {
+  await getWorkspaceByIdForUser(workspaceId, userId);
+
+  const transcript = await fetchYoutubeTranscript(input.url);
+
+  return createAndProcessSource({
+    workspaceId,
+    type: "YOUTUBE",
+    title: input.title || `YouTube: ${transcript.videoId}`,
+    content: transcript.content,
+    url: input.url,
+    status: "PENDING",
+    metadata: {
+      videoId: transcript.videoId,
     },
   });
 }
