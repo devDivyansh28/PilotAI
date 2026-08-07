@@ -15,7 +15,10 @@ import {
   listSourcesForWorkspace,
   uploadPdfSource,
   importWebsiteSource,
-  importYoutubeSource
+  importYoutubeSource,
+  getSourceForWorkspace,
+  deleteSourceForWorkspace,
+  bulkDeleteSourcesForWorkspace,
 } from "../services/source.services.js";
 
 function parseWorkspaceId(params: Request["params"]) {
@@ -103,6 +106,34 @@ export async function createSource(req: Request, res: Response) {
     input,
   );
   res.status(201).json(source);
+}
+
+export async function getSource(req: Request, res: Response) {
+  const { workspaceId, sourceId } = parseSourceParams(req.params);
+  const source = await getSourceForWorkspace(
+    workspaceId,
+    sourceId,
+    req.session.user.id,
+  );
+  res.json(source);
+}
+
+
+export async function deleteSource(req: Request, res: Response) {
+  const { workspaceId, sourceId } = parseSourceParams(req.params);
+  await deleteSourceForWorkspace(workspaceId, sourceId, req.session.user.id);
+  res.status(204).send();
+}
+
+export async function bulkDeleteSources(req: Request, res: Response) {
+  const { workspaceId } = parseWorkspaceId(req.params);
+  const input = parseBulkDeleteBody(req.body);
+  await bulkDeleteSourcesForWorkspace(
+    workspaceId,
+    req.session.user.id,
+    input.sourceIds,
+  );
+  res.status(204).send();
 }
 
 export async function uploadPdf(req: Request, res: Response) {
