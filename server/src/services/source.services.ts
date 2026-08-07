@@ -20,6 +20,7 @@ import { getWorkspaceByIdForUser } from "./workspace.services.js";
 
 import { uploadPdfToCloudinary } from "../lib/cloudinary.js";
 import { extractPdfFromBuffer } from "../lib/pdf.js";
+import { enqueueSourceProcessing } from "../lib/source-events.js";
 
 async function assertWorkspaceAccess(workspaceId: string, userId: string) {
   await getWorkspaceByIdForUser(workspaceId, userId);
@@ -30,10 +31,10 @@ async function createAndProcessSource(
 ) {
   const source = await createSourceRecord(data);
 
-  // await enqueueSourceProcessing({
-  //   sourceId : source.id,
-  //   workspaceId : source.workspaceId,
-  // });
+  await enqueueSourceProcessing({
+    sourceId : source.id,
+    workspaceId : source.workspaceId,
+  });
 
   return source;
 }
