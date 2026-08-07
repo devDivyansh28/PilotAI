@@ -142,7 +142,7 @@ model SourceChunk {
   id String @id @default(cuid())
   sourceId String
   index Int
-  cotent String
+  content String
   tokenCount Int?
   metaData Json?
   createdAt DateTime @default(now())
