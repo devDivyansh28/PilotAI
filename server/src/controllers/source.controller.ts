@@ -11,10 +11,9 @@ import {
 } from "../validators/source.validator.js";
 import { workspaceIdParamSchema } from "../validators/workspace.validator.js";
 import {
- 
   createTextOrMarkdownSource,
-
   listSourcesForWorkspace,
+  uploadPdfSource
 } from "../services/source.services.js";
 
 function parseWorkspaceId(params: Request["params"]) {
@@ -93,7 +92,6 @@ export async function listSources(req: Request, res: Response) {
   res.json(sources);
 }
 
-
 export async function createSource(req: Request, res: Response) {
   const { workspaceId } = parseWorkspaceId(req.params);
   const input = parseCreateBody(req.body);
@@ -105,3 +103,21 @@ export async function createSource(req: Request, res: Response) {
   res.status(201).json(source);
 }
 
+export async function uploadPdf(req: Request, res: Response) {
+  const { workspaceId } = workspaceIdParamSchema.parse(req.params);
+
+  if (!req.file) {
+    throw new ValidationError("PDF file is required");
+  }
+
+  const title = typeof req.body.title === "string" ? req.body.title : undefined;
+
+  const source = await uploadPdfSource(
+    workspaceId,
+    req.session.user.id,
+    req.file,
+    title,
+  );
+
+  res.status(201).json(source);
+}
